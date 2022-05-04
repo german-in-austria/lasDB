@@ -1,0 +1,1 @@
+workon lasDB & manage.py runserver & pause

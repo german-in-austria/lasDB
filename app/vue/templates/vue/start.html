@@ -1,0 +1,25 @@
+{% load staticfiles %}
+{% load lasTags %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>lasDb</title>
+    <link href="{% static 'main/js/pdfjs-2.0.943-dist/plugin/text_layer_builder.css' %}" rel="stylesheet">
+    {% render_bundle 'app' 'css' 'lasDB' %}
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="{% static 'main/js/pdfjs-2.0.943-dist/build/pdf.js' %}"></script>
+    <script src="{% static 'main/js/pdfjs-2.0.943-dist/plugin/text_layer_builder.js' %}"></script>
+    <script>
+      var csrf='{{ csrf_token }}';
+      var pdfjsLib = window['pdfjs-dist/build/pdf'];
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '{% static "main/js/pdfjs-2.0.943-dist/build/pdf.worker.js" %}';
+    </script>
+    {% render_bundle 'manifest' 'js' 'lasDB' %}
+    {% render_bundle 'vendor' 'js' 'lasDB' %}
+    {% render_bundle 'app' 'js' 'lasDB' %}
+  </body>
+</html>
