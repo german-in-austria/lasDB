@@ -9,6 +9,8 @@
         <div v-if="variantgroupCheck">
           Without Variables: {{ variantgroupCheck.filter(c => c.variables.length === 0).length }}<br>
           More than one Variables: {{ variantgroupCheck.filter(c => c.variables.length > 1).length }}<br>
+          <br>
+          First 100 Entries:<br>
         </div>
         <ul class="mt-2" v-if="variantgroupCheck">
           <li v-for="aVG in variantgroupCheck" :key="aVG.id">

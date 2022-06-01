@@ -27,7 +27,7 @@ def view_variantgroup(request):
     aModel = apps.get_model(app_label='db', model_name='lex_variantgroup')
     status['variantgroup'] = { 'withoutVariableCount': aModel.objects.filter(lex_variable = None).count(), 'count': aModel.objects.all().count() }
     if 'check' in request.POST and request.POST.get('check'):
-      aQuery = aModel.objects.filter(lex_variable = None)
+      aQuery = aModel.objects.filter(lex_variable = None)[0:100]
       status['check'] = []
       for aVG in aQuery:
         aVGvariables = []
