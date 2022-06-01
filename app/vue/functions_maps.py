@@ -17,7 +17,10 @@ def view_maps(request):
 
 def getMaps(request):
 	maps = []
-	for aMap in map.objects.all():
+	mapQuery = map.objects.filter(public=True)
+	if request.user.is_authenticated:
+		mapQuery = map.objects.all()
+	for aMap in mapQuery:
 		maps.append({
 			'id': aMap.id,
 			'name': aMap.name,
@@ -55,8 +58,12 @@ def getMap(request):
 		# print('aMapToVar', aMapToVar, aMapToVar.variantgroup, aMapToVar.variantgroup.lex_variant_to_variantgroup_set.all().count())
 		for variant in aMapToVar.variantgroup.lex_variant_to_variantgroup_set.select_related('lex_variant').all():
 			# print('variant', variant, 'lex_variant', variant.lex_variant)
+			# print('lex_variable_id', aMapToVar.variantgroup.lex_variable_id)
+			aDS = variant.lex_variant.data_set.select_related('by_inf')
+			if aMapToVar.variantgroup.lex_variable_id:
+				aDS = aDS.filter(lex_variable_id=aMapToVar.variantgroup.lex_variable_id)
 			vData = []
-			for data in variant.lex_variant.data_set.filter(lex_variable_id=aMapToVar.variantgroup.lex_variable_id).select_related('by_inf').all():
+			for data in aDS.all():
 				vData.append({
 					'id': data.id,
 					'infId': data.by_inf.id,

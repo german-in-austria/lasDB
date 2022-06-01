@@ -15,7 +15,7 @@
         <template v-if="mapData && contentID > 0 && !editMap">
           <v-btn @click="contentID = 0" flat fab small style="position:absolute;right:0px;top:0px;width:20px;height:20px;"><v-icon>mdi-close</v-icon></v-btn>
           <h1>
-            {{ mapData.values.name.val }} (ID: {{ mapData.values.id.val }})
+            {{ mapData.values.name.val }} (ID: {{ mapData.values.id.val }}) {{ mapData.values.public.val ? ' Public!' : ''}}
             <v-btn @click="editMap = true" color="primary" fab small dark><v-icon>edit</v-icon></v-btn>
           </h1>
           <h2 class="mt-1" v-if="mapData.values.title.val">{{ mapData.values.title.val }}</h2>
@@ -55,12 +55,12 @@
                 :needValue="false"
               />
             </v-flex>
-              {{ selectedVariable.variable.val > 0 ? ['lex_variable', selectedVariable.variable.val] : null }}
+              <!-- {{ selectedVariable.variable.val > 0 ? ['lex_variable', selectedVariable.variable.val] : null }} -->
             <v-flex xs12 md2 align-self-center>
               <v-btn color="info" @click="addMapToVariantgroup(selectedGroup.group.val)" :disabled="!(selectedGroup && selectedGroup.group && selectedGroup.group.val > 0)">Add variant group</v-btn>
             </v-flex>
           </v-layout>
-          <div class="py-3" v-if="sortetMapToVariantgroupData">
+          <div class="py-3" v-if="sortedMapToVariantgroupData">
             <v-data-table
               :headers="[
                 {value: 'order', text: '#', right: true, compact: true},
@@ -69,7 +69,7 @@
                 {value: 'preset_color', text: 'Color'},
                 {value: '', text: 'Tools', right: true},
               ]"
-              :items="sortetMapToVariantgroupData"
+              :items="sortedMapToVariantgroupData"
               :pagination.sync="pagination"
               class="nooverflow elevation-1 mt-3"
             >
@@ -111,7 +111,7 @@
                     <template v-if="!props.item.delete">
                       <v-btn @click="deleteMapToVariantgroup(props.item)" color="red" icon flat small><v-icon>delete_forever</v-icon></v-btn>
                       <v-btn @click="moveMapToVariantgroup(props.item, -1.5)" icon flat small class="mx-1" :disabled="props.index === 0"><v-icon>mdi-chevron-up</v-icon></v-btn>
-                      <v-btn @click="moveMapToVariantgroup(props.item, 1.5)" icon flat small class="ml-0 mr-1" :disabled="props.index === sortetMapToVariantgroupData.length - 1"><v-icon>mdi-chevron-down</v-icon></v-btn>
+                      <v-btn @click="moveMapToVariantgroup(props.item, 1.5)" icon flat small class="ml-0 mr-1" :disabled="props.index === sortedMapToVariantgroupData.length - 1"><v-icon>mdi-chevron-down</v-icon></v-btn>
                     </template>
                   </td>
                 </tr>
@@ -288,7 +288,7 @@ export default {
         }
       })
       let dg = 0
-      this.sortetMapToVariantgroupData.forEach(mtv => {
+      this.sortedMapToVariantgroupData.forEach(mtv => {
         mtv.order = dg++
       })
       this.changedMapToVariantgroupData()
@@ -304,7 +304,7 @@ export default {
       console.log('upMapToVariantgroup', mtvObj)
       mtvObj.order += add
       let dg = 0
-      this.sortetMapToVariantgroupData.forEach(mtv => {
+      this.sortedMapToVariantgroupData.forEach(mtv => {
         mtv.order = dg++
       })
       this.changedMapToVariantgroupData()
@@ -316,7 +316,7 @@ export default {
         .post('/maptovariantgroups/', {
           set: 'setMapToVariantgroupData',
           mapID: this.contentID,
-          mtvObjs: JSON.stringify(this.sortetMapToVariantgroupData)
+          mtvObjs: JSON.stringify(this.sortedMapToVariantgroupData)
         }, {headers: {'X-CSRFToken': this.csrf}, emulateJSON: true})
         .then((response) => {
           console.log(response.data)
@@ -350,7 +350,7 @@ export default {
     }
   },
   computed: {
-    sortetMapToVariantgroupData () {
+    sortedMapToVariantgroupData () {
       return this.mapToVariantgroupData && this.mapToVariantgroupData.map_to_variantgroup && this.mapToVariantgroupData.map_to_variantgroup.slice().sort((a, b) => { return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0) })
     }
   },

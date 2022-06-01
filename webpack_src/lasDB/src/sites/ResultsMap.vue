@@ -339,6 +339,7 @@ export default {
                 },
                 ...response.data.maps
               ]
+              console.log(response.data.maps)
               this.locations = {
                 list: [],
                 byId: {}
@@ -717,6 +718,7 @@ export default {
 .fx-txt {
   display: block;
   max-height: 9rem;
+  max-height: 25vh;
   overflow-y: auto;
 }
 </style>

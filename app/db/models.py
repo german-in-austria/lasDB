@@ -203,11 +203,12 @@ class map(models.Model):
   legend_title = models.CharField(max_length=128,
                            db_index=True,
                            blank=True, null=True)
+  public = models.BooleanField(default=False)
   description = models.TextField(blank=True, null=True)
   comment = models.TextField(blank=True, null=True)
 
   def __str__(self):
-    return self.name
+    return (str(self.name) if self.name else str(self.legend_title)) + ('' if self.public else ' - PRIVATE')
 
   class Meta:
     verbose_name = "map"
@@ -266,6 +267,7 @@ class lex_variantgroup(models.Model):
     ordering = ('name',)
     default_permissions = ()
     search_fields = ['name']
+    filter_fields = ['lex_variable']
 
 
 class languages(models.Model):
