@@ -78,7 +78,8 @@ export default new Router({
     {
       path: '/results/map/',
       name: 'ResultsMap',
-      component: ResultsMap
+      component: ResultsMap,
+      props: route => ({ query: route.query })
     },
     {
       path: '/tools/map/',

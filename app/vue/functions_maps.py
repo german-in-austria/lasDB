@@ -27,7 +27,8 @@ def getMaps(request):
 			'title': aMap.title,
 			'legend_title': aMap.legend_title,
 			'comment': aMap.comment,
-			'description': aMap.description
+			'description': aMap.description,
+			'public': aMap.public
 		})
 	variables = []
 	for aVariable in lex_variable.objects.all():

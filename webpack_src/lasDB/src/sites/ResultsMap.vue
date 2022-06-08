@@ -126,7 +126,8 @@
       </template>
       <template v-if="selectedMap && mapObj && !mapLoading">
         <div class="mt-3">
-          <h2 v-if="mapObj.title">{{ mapObj.title }}</h2>
+          <h2 v-if="mapObj.title">{{ mapObj.title + (mapObj.public ? ' - Private' : ' - Public') }}</h2>
+          <h2 v-else-if="!mapObj.public">Private</h2>
           <p v-if="mapObj.description" class="mt-2 fx-txt">{{ mapObj.description }}</p>
           <p v-if="mapObj.comment" class="mt-2 fx-txt">{{ mapObj.comment }}</p>
           <p class="mt-2" v-if="mapData">
@@ -178,11 +179,14 @@ import { LMap, LTileLayer, LControl, LControlLayers, LCircleMarker, LTooltip, LC
 
 export default {
   name: 'ResultsMap',
-  props: ['user', 'options', 'csrf'],
+  props: ['user', 'options', 'csrf', 'query'],
   data () {
     return {
       loading: false,
       mapLoading: false,
+      newQuery: true,
+      reSetQuery: false,
+      variantsQuery: false,
       selectedMap: null,
       maps: null,
       mapData: null,
@@ -270,8 +274,47 @@ export default {
       this.updateKmPerPixel()
       // console.log('mapObject', this.map.map)
     })
+    this.getQuery()
   },
   methods: {
+    getQuery () {
+      if (this.query && this.newQuery && !(this.loading || this.mapLoading)) {
+        console.log('getQuery', this.query)
+        this.selectedMap = this.query.smid && (this.maps.filter(m => m.id === parseInt(this.query.smid)).length > 0) ? parseInt(this.query.smid) : null
+        this.map.markerSource = this.query.mms || this.map.markerSource
+        this.map.show = this.query.ms || this.map.show
+        this.map.radius = this.query.mr || this.map.radius
+        this.map.circleOpacity = this.query.mco ? parseInt(this.query.mco) : this.map.circleOpacity
+        this.map.circleStroke = typeof this.query.mcs === 'boolean' ? this.query.mcs : this.map.circleStroke
+        this.selectedVariable = this.query.svb > 0 ? parseInt(this.query.svb) : this.selectedVariable
+        this.selectedVariants = this.query.svt && Array.isArray(this.query.svt) ? this.query.svt.map(w => parseInt(w)) : this.selectedVariants
+        if (this.selectedVariants && this.selectedVariants.length > 0) {
+          this.variantsQuery = true
+        }
+        this.newQuery = false
+      }
+    },
+    setQuery () {
+      if (!(this.loading || this.mapLoading)) {
+        console.log('setQuery', this.selectedMap, this.selectedVariable, this.selectedVariants)
+        this.$router.push({
+          path: '/results/map/',
+          query: {
+            smid: this.selectedMap,
+            mms: this.map.markerSource,
+            ms: this.map.show,
+            mr: this.map.radius,
+            mco: this.map.circleOpacity,
+            mcs: this.map.circleStroke,
+            svb: this.selectedVariable,
+            svt: this.selectedVariants
+          }
+        })
+        this.reSetQuery = false
+      } else {
+        this.reSetQuery = true
+      }
+    },
     latLng: L.latLng,
     setView (latLon, zoom) {
       this.map.map.setView(latLon, zoom || this.zoom)
@@ -335,7 +378,8 @@ export default {
                   id: -1,
                   legend_title: null,
                   name: 'individual variables',
-                  title: null
+                  title: null,
+                  public: true
                 },
                 ...response.data.maps
               ]
@@ -361,11 +405,19 @@ export default {
               //   this.selectedMap = this.maps[1].id
               // }
               this.loading = false
+              this.getQuery()
+              if (this.reSetQuery) {
+                this.setQuery()
+              }
             })
           })
           .catch((err) => {
             console.log(err)
             this.loading = false
+            this.getQuery()
+            if (this.reSetQuery) {
+              this.setQuery()
+            }
           })
       }
     },
@@ -444,18 +496,28 @@ export default {
               }
               console.log('mapData', this.mapData)
               this.mapLoading = false
+              this.getQuery()
+              if (this.reSetQuery) {
+                this.setQuery()
+              }
             })
           })
           .catch((err) => {
             console.log(err)
             this.mapLoading = false
+            this.getQuery()
+            if (this.reSetQuery) {
+              this.setQuery()
+            }
           })
       }
     },
     loadVariants () {
       if (!this.mapLoading && this.selectedVariable > 0) {
         this.mapLoading = true
-        this.selectedVariants = null
+        if (!this.variantsQuery) {
+          this.selectedVariants = null
+        }
         this.$http
           .post('/maps/', {
             get: 'variants',
@@ -473,11 +535,28 @@ export default {
                 this.variants.byId[v.id] = v
               })
               this.mapLoading = false
+              this.getQuery()
+              if (this.reSetQuery) {
+                this.setQuery()
+              }
+              if (this.variantsQuery) {
+                this.loadVariantsMap()
+                this.variantsQuery = false
+              }
+              this.loadVariantsMap()
             })
           })
           .catch((err) => {
             console.log(err)
             this.mapLoading = false
+            this.getQuery()
+            if (this.reSetQuery) {
+              this.setQuery()
+            }
+            if (this.variantsQuery) {
+              this.loadVariantsMap()
+              this.variantsQuery = false
+            }
           })
       }
     },
@@ -556,11 +635,19 @@ export default {
               }
               console.log('mapData', this.mapData)
               this.mapLoading = false
+              this.getQuery()
+              if (this.reSetQuery) {
+                this.setQuery()
+              }
             })
           })
           .catch((err) => {
             console.log(err)
             this.mapLoading = false
+            this.getQuery()
+            if (this.reSetQuery) {
+              this.setQuery()
+            }
           })
       }
     }, 250)
@@ -568,7 +655,7 @@ export default {
   computed: {
     points () {
       let aPoints = []
-      if (this.mapData) {
+      if (this.mapData && (this.selectedMap < 0 || this.selectedMap > 0)) {
         let aLocations = this.mapData[this.map.markerSource]
         if (aLocations) {
           var locWOcoords = 0
@@ -648,12 +735,36 @@ export default {
         this.mapData = null
         this.loadMap()
       }
+      this.setQuery()
     },
     selectedVariable () {
       if (this.selectedVariable) {
         this.mapData = null
         this.loadVariants()
       }
+      this.setQuery()
+    },
+    'map.markerSource' () {
+      this.setQuery()
+    },
+    'map.show' () {
+      this.setQuery()
+    },
+    'map.radius' () {
+      this.setQuery()
+    },
+    'map.circleOpacity' () {
+      this.setQuery()
+    },
+    'map.circleStroke' () {
+      this.setQuery()
+    },
+    selectedVariants () {
+      this.setQuery()
+    },
+    query () {
+      this.newQuery = true
+      this.getQuery()
     }
   },
   components: {
