@@ -69,7 +69,7 @@ def delVariantgroup(request):
 	output = {}
 	if 'id' in request.POST:
 		from django.apps import apps
-		aModel = apps.get_model(app_label='db', model_name='lex_variantgroup')
+		aModel = apps.get_model(app_label='db', model_name='lex_variant_to_variantgroup')
 		aQuery = aModel.objects.get(id=request.POST.get('id'))
 		aQuery.delete()
 	if output:

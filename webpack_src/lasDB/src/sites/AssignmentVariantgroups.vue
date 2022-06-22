@@ -91,7 +91,7 @@
                       <b v-else>
                         Error (Delete me!)
                       </b>
-                      <v-icon small @click.stop="deleteGroupAssigmination(group.id)">delete</v-icon>
+                      <v-icon small @click.stop="deleteGroupAssignation(group.id)">delete</v-icon>
                     </span>
                   </template>
                   <template v-else>
@@ -245,8 +245,8 @@ export default {
         alert('Error on creating file!')
       }
     },
-    deleteGroupAssigmination (id) {
-      console.log('deleteGroupAssigmination', id)
+    deleteGroupAssignation (id) {
+      console.log('deleteGroupAssignation', id)
       if (confirm('Really delete assignment?')) {
         this.loadingVariant = true
         this.$http
@@ -255,7 +255,7 @@ export default {
             id: id
           }, {headers: {'X-CSRFToken': this.csrf}, emulateJSON: true})
           .then((response) => {
-            console.log('deleteGroupAssigmination', response.data)
+            console.log('deleteGroupAssignation', response.data)
             this.loadingVariant = false
             this.getVariantByVariable(false)
           })

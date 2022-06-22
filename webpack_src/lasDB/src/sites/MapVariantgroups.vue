@@ -256,7 +256,11 @@ export default {
           let dg = 0
           response.data.map_to_variantgroup.forEach(mvg => {
             if (!mvg.preset_color) {
-              mvg.preset_color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+              let rCol = Math.floor(Math.random() * 16777215).toString(16)
+              while (rCol.length < 6) {
+                rCol = '0' + rCol
+              }
+              mvg.preset_color = '#' + rCol
               this.changedMapToVariantgroupData()
             }
             if (mvg.order !== dg) {
@@ -278,10 +282,14 @@ export default {
     },
     addMapToVariantgroup (gId) {
       console.log('addMapToVariantgroup', gId)
+      let rCol = Math.floor(Math.random() * 16777215).toString(16)
+      while (rCol.length < 6) {
+        rCol = '0' + rCol
+      }
       this.mapToVariantgroupData.map_to_variantgroup.push({
         id: -1,
         order: 99999999,
-        preset_color: '#' + Math.floor(Math.random() * 16777215).toString(16),
+        preset_color: '#' + rCol,
         variantgroup: {
           id: gId,
           name: 'Added now ... (ID: ' + gId + ')'

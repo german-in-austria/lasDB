@@ -152,6 +152,10 @@
             </v-slider>
             <v-checkbox v-model="map.circleStroke" class="mt-2" label="Stroke" hide-details></v-checkbox>
           </template>
+          <div class="mt-2" v-if="selectedMap > 0 && maps && mapObj">
+            <v-btn @click="selectedMap = maps[maps.indexOf(mapObj) - 1].id" :disabled="maps.indexOf(mapObj) < 2">prior map</v-btn>
+            <v-btn @click="selectedMap = maps[maps.indexOf(mapObj) + 1].id" :disabled="maps.indexOf(mapObj) > maps.length - 2">next map</v-btn>
+          </div>
         </template>
       </template>
       <v-alert type="info" v-else>
@@ -341,6 +345,7 @@ export default {
       let lAng = 0
       data.forEach(el => {
         let nAng = lAng + el.v * angMulti
+        console.log(el.c)
         out += '<path d="' + describeArc(hSize, hSize, ihSize, lAng, nAng) + '" stroke-width="0" fill="' + (el.c || '#f00') + '" />'
         lAng = nAng
       })
@@ -580,7 +585,11 @@ export default {
               let districts = {}
               if (response.data.variants) {
                 response.data.variants.forEach(v => {
-                  v.preset_color = '#' + Math.floor(this.random(v.id) * 16777215).toString(16)
+                  let rCol = Math.floor(this.random(v.id) * 16777215).toString(16)
+                  while (rCol.length < 6) {
+                    rCol = '0' + rCol
+                  }
+                  v.preset_color = '#' + rCol
                   if (v.data) {
                     v.data.forEach(d => {
                       if (!locations[d.fDist]) {
