@@ -25,6 +25,7 @@
               </v-list>
             </v-menu>
             <v-btn flat to="/results/map/" class="not-upper">Map</v-btn>
+            <v-btn flat to="/results/explore/" class="not-upper">Explore</v-btn>
             <v-menu left offset-y v-if="user">
               <template v-slot:activator="{ on }">
                 <v-btn flat v-on="on" class="not-upper" title="DB Tools"><v-icon>build</v-icon></v-btn>
@@ -51,7 +52,7 @@
       </v-toolbar>
       <v-content>
         <v-container flex h-100>
-          <router-view :user="user" :options="options" :csrf="csrf" v-if="user || this.$route.name === 'ResultsMap'" />
+          <router-view :user="user" :options="options" :csrf="csrf" v-if="user || this.$route.name === 'ResultsMap' || this.$route.name === 'ResultsExplore'" />
         </v-container>
         <DialogLogin :user="user" @updateCSRFToken="updateCSRFToken" :csrf="csrf" v-if="loginNow" />
       </v-content>

@@ -92,6 +92,7 @@
         hide-details
         dense
         :loading="loading || mapLoading"
+        v-if="!individual"
       />
       <template v-if="selectedMap === -1">
         <v-autocomplete
@@ -153,7 +154,7 @@
             <v-checkbox v-model="map.circleStroke" class="mt-2" label="Stroke" hide-details></v-checkbox>
           </template>
           <div class="mt-2" v-if="selectedMap > 0 && maps && mapObj">
-            <v-btn @click="selectedMap = maps[maps.indexOf(mapObj) - 1].id" :disabled="maps.indexOf(mapObj) < 2">prior map</v-btn>
+            <v-btn @click="selectedMap = maps[maps.indexOf(mapObj) - 1].id" :disabled="maps.indexOf(mapObj) < 1">prior map</v-btn>
             <v-btn @click="selectedMap = maps[maps.indexOf(mapObj) + 1].id" :disabled="maps.indexOf(mapObj) > maps.length - 2">next map</v-btn>
           </div>
         </template>
@@ -192,7 +193,7 @@ export default {
       reSetQuery: false,
       variantsQuery: false,
       selectedMap: null,
-      maps: null,
+      mapsRaw: null,
       mapData: null,
       locations: {
         list: [],
@@ -271,6 +272,7 @@ export default {
     }
   },
   mounted () {
+    this.selectedMap = this.individual ? -1 : null
     this.loadMaps()
     this.map.center = this.map.home
     this.$nextTick(() => {
@@ -302,7 +304,7 @@ export default {
       if (!(this.loading || this.mapLoading)) {
         console.log('setQuery', this.selectedMap, this.selectedVariable, this.selectedVariants)
         this.$router.push({
-          path: '/results/map/',
+          path: this.$route.path,
           query: {
             smid: this.selectedMap,
             mms: this.map.markerSource,
@@ -345,7 +347,7 @@ export default {
       let lAng = 0
       data.forEach(el => {
         let nAng = lAng + el.v * angMulti
-        console.log(el.c)
+        // console.log(el.c)
         out += '<path d="' + describeArc(hSize, hSize, ihSize, lAng, nAng) + '" stroke-width="0" fill="' + (el.c || '#f00') + '" />'
         lAng = nAng
       })
@@ -373,21 +375,10 @@ export default {
             get: 'maps'
           }, {headers: {'X-CSRFToken': this.csrf}, emulateJSON: true})
           .then((response) => {
-            this.maps = null
+            this.mapsRaw = null
             this.$nextTick(() => {
               console.log('loadMaps', response.data)
-              this.maps = [
-                {
-                  comment: null,
-                  description: null,
-                  id: -1,
-                  legend_title: null,
-                  name: 'individual variables',
-                  title: null,
-                  public: true
-                },
-                ...response.data.maps
-              ]
+              this.mapsRaw = response.data.maps
               console.log(response.data.maps)
               this.locations = {
                 list: [],
@@ -662,6 +653,26 @@ export default {
     }, 250)
   },
   computed: {
+    maps () {
+      if (this.individual) {
+        return [
+          {
+            comment: null,
+            description: null,
+            id: -1,
+            legend_title: null,
+            name: 'individual variables',
+            title: null,
+            public: true
+          }
+        ]
+      } else {
+        return this.mapsRaw
+      }
+    },
+    individual () {
+      return this.$route.name === 'ResultsExplore'
+    },
     points () {
       let aPoints = []
       if (this.mapData && (this.selectedMap < 0 || this.selectedMap > 0)) {
@@ -736,6 +747,16 @@ export default {
     }
   },
   watch: {
+    individual () {
+      if (this.individual) {
+        this.selectedMap = -1
+      } else {
+        this.selectedMap = null
+        this.selectedVariable = null
+        this.selectedVariants = null
+      }
+      this.setQuery()
+    },
     'map.zoom' () {
       this.updateKmPerPixel()
     },

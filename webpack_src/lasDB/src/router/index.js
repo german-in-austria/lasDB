@@ -82,6 +82,12 @@ export default new Router({
       props: route => ({ query: route.query })
     },
     {
+      path: '/results/explore/',
+      name: 'ResultsExplore',
+      component: ResultsMap,
+      props: route => ({ query: route.query })
+    },
+    {
       path: '/tools/map/',
       name: 'ToolsMap',
       component: ToolsMap
