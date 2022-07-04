@@ -286,7 +286,7 @@ export default {
     getQuery () {
       if (this.query && this.newQuery && !(this.loading || this.mapLoading)) {
         console.log('getQuery', this.query)
-        this.selectedMap = this.query.smid && (this.maps.filter(m => m.id === parseInt(this.query.smid)).length > 0) ? parseInt(this.query.smid) : null
+        this.selectedMap = this.individual ? -1 : this.query.smid && (this.maps.filter(m => m.id === parseInt(this.query.smid)).length > 0) ? parseInt(this.query.smid) : null
         this.map.markerSource = this.query.mms || this.map.markerSource
         this.map.show = this.query.ms || this.map.show
         this.map.radius = this.query.mr || this.map.radius
