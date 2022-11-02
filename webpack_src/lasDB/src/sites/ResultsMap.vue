@@ -233,13 +233,13 @@ export default {
             url: 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
             attribution: 'Humanitarian Open Tiles'
           },
-          {
-            name: 'NLS',
-            visible: false,
-            url: 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg',
-            attribution: '<a href="https://maps.nls.uk/projects/api/">National Library of Scotland Historic Maps</a>',
-            subdomains: '0123'
-          },
+          // {
+          //   name: 'NLS',
+          //   visible: false,
+          //   url: 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg',
+          //   attribution: '<a href="https://maps.nls.uk/projects/api/">National Library of Scotland Historic Maps</a>',
+          //   subdomains: '0123'
+          // },
           {
             name: 'Stamen.TonerBackground',
             visible: false,
