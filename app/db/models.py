@@ -110,9 +110,9 @@ class loc_type(models.Model):
 
 
 class data(models.Model):
-  lex_variable = models.ForeignKey('lex_variable', on_delete=models.CASCADE)
-  lex_variant = models.ForeignKey('lex_variant', on_delete=models.CASCADE)
-  by_inf = models.ForeignKey('informant', on_delete=models.CASCADE)
+  lex_variable = models.ForeignKey('lex_variable', on_delete=models.SET_NULL)
+  lex_variant = models.ForeignKey('lex_variant', on_delete=models.SET_NULL)
+  by_inf = models.ForeignKey('informant', on_delete=models.SET_NULL)
   semantic_special = models.CharField(max_length=128,
                                       blank=True, null=True)
   comment = models.TextField(blank=True, null=True)
@@ -310,9 +310,9 @@ class lex_variantgroup_types(models.Model):
 class lex_variant_to_variantgroup(models.Model):
   lex_variant = models.ForeignKey('lex_variant',
                                   blank=True, null=True,
-                                  on_delete=models.CASCADE)
+                                  on_delete=models.SET_NULL)
   variantgroup = models.ForeignKey('lex_variantgroup',
-                                   on_delete=models.CASCADE,
+                                   on_delete=models.SET_NULL,
                                    blank=True, null=True)
   order = models.IntegerField(blank=True, null=True)
 
@@ -328,9 +328,9 @@ class lex_variant_to_variantgroup(models.Model):
 
 class map_to_variantgroup(models.Model):
   map = models.ForeignKey('map',
-                          on_delete=models.CASCADE)
+                          on_delete=models.SET_NULL)
   variantgroup = models.ForeignKey('lex_variantgroup',
-                                   on_delete=models.CASCADE)
+                                   on_delete=models.SET_NULL)
   order = models.IntegerField(blank=True, null=True)
   preset_color = models.CharField(max_length=7,
                                   blank=True, null=True)
