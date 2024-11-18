@@ -52,7 +52,7 @@ else:
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '.dioe.at']
 
-ALLOWED_SETTINGS_IN_TEMPLATES = ("CACH_RANDOM")
+ALLOWED_SETTINGS_IN_TEMPLATES = ("CACH_RANDOM", "BUILD_DATETIME")
 
 CACH_RANDOM = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for i in range(8))
 
@@ -205,3 +205,9 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.abspath(os.path.join(BASE_DIR, os.pardir, 'webpack_src', 'lasDB', 'webpack-stats.json')),
     }
 }
+
+try:
+    with open('/home/docker/code/build_datetime.txt', 'r') as f:
+        BUILD_DATETIME = f.read().strip()
+except FileNotFoundError:
+    BUILD_DATETIME = 'unbekannt'

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  las-db:
+    image: hcbreuer/lasdb:latest
+    container_name: lasdb
+    restart: always
+    environment:
+      LASDB_DB: django.db.backends.postgresql_psycopg2
+      LASDB_DB_HOST: postgres
+      LASDB_DB_NAME: lasdb
+      LASDB_DB_PASSWORD: djiw17e35oe
+      LASDB_DB_PORT: 5432
+      LASDB_DB_USER: lasdbuser
+      LASDB_DEBUG: True
+      LASDB_PRIVATE_STORAGE_AUTH_FUNCTION: private_storage.permissions.allow_authenticated
+      LASDB_PRIVATE_STORAGE_INTERNAL_URL: /private-x-accel-redirect/
+      LASDB_PRIVATE_STORAGE_ROOT: /home/docker/persistent/private-media/
+      LASDB_PRIVATE_STORAGE_SERVER: nginx
+      LASDB_SECRET_KEY: ko_*dy37!v8mkl-uxoiew&cria9y=ga0vw)huzc%l(@rn7cpsq
+      LASDB_STATIC_ROOT: /static
+    ports:
+      - "5780:80"
+    volumes:
+      - ./las-db/persistent:/home/docker/persistent
+      - ./las-db/migrations/db:/home/docker/code/app/db/migrations
+      - ./las-db/migrations/hcbDiagram:/home/docker/code/app/hcbDiagram/migrations
+      - ./las-db/migrations/vue:/home/docker/code/app/vue/migrations
+    networks:
+      - las-net
+
+  postgres:
+    image: postgres:9.6
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: lasdb
+      POSTGRES_PASSWORD: djiw17e35oe
+      POSTGRES_USER: lasdbuser
+    volumes:
+      - ./las-db/postgres:/var/lib/postgresql/data
+    networks:
+      - las-net
+
+networks:
+  las-net:
+    driver: bridge

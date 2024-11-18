@@ -39,3 +39,6 @@ Put these into a `.env` file for convenient access.
 ```
 sudo docker exec $(sudo docker ps -q --filter name=r-las-db-lasdb-1) pg_dump -U lasdbuser lasdb > lasdb-2020-08-31.sql 2>lasdb-2020-08-31_sql.err
 ```
+
+### Beispiel für docker-composer.yml
+ - `/composer/`

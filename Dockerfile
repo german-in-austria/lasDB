@@ -3,41 +3,34 @@ FROM ubuntu:18.04
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-# INSTALL EVERYTHING (”-y” WITHOUT ASKING FOR PERMISSION)
-RUN apt-get update
-RUN apt-get install -y software-properties-common
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get update -yq && apt-get install -y curl gnupg && curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y --force-yes nodejs
-RUN apt-get update
-RUN apt-get install -y git
-RUN apt-get install -y python3.5
-RUN apt-get update
-RUN rm /usr/bin/python3
-RUN ln -s /usr/bin/python3.5 /usr/bin/python3
-RUN apt-get install -y python3-pip
-RUN apt-get install -y python3.5-dev
-RUN apt-get install -y python3-setuptools
-RUN apt-get install -y nginx
-RUN apt-get install -y supervisor
-RUN apt-get install -y sqlite3
-RUN apt-get install -y postgresql-client
-
-RUN apt-get update
-RUN apt-get install -y libtiff5-dev
-RUN apt-get install -y libjpeg8-dev
-RUN apt-get install -y zlib1g-dev
-RUN apt-get install -y libfreetype6-dev
-RUN apt-get install -y liblcms2-dev
-RUN apt-get install -y libwebp-dev
-RUN apt-get install -y libharfbuzz-dev
-RUN apt-get install -y libfribidi-dev
-RUN apt-get install -y libpq-dev
-RUN apt-get install -y tcl8.6-dev
-RUN apt-get install -y tk8.6-dev
-RUN apt-get install -y python-tk
-
-# CLEAN UP
-RUN rm -rf /var/lib/apt/lists/*
+# INSTALL EVERYTHING
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    curl gnupg \
+    git \
+    python3 \
+    python3-pip \
+    python3-dev \
+    python3-setuptools \
+    python3-tk \
+    nginx \
+    supervisor \
+    sqlite3 \
+    postgresql-client \
+    libtiff5-dev \
+    libjpeg8-dev \
+    zlib1g-dev \
+    libfreetype6-dev \
+    liblcms2-dev \
+    libwebp-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libpq-dev \
+    tcl8.6-dev \
+    tk8.6-dev \
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # INSTALL UWSGI
 RUN pip3 install uwsgi
@@ -60,6 +53,8 @@ RUN cd /home/docker/code/webpack_src/lasDB && npm install && npm run build
 
 # ADD APP CODE
 COPY app/ /home/docker/code/app/
+
+RUN date '+%Y-%m-%d %H:%M:%S' > /home/docker/code/build_datetime.txt
 
 # COLLECT ALL STATIC FILES IN /STATIC
 ENV LASDB_STATIC_ROOT=/static
